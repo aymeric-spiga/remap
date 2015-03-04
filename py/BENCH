@@ -1,27 +1,30 @@
 
-remap.py -R TEST_DIAG/xios_diagfi_7420140-7610399.nc 512
+-- time for WEIGHTS computations
 
-no debug
-GRID 2.70 sec // WEIGHTS 116.25 sec // REMAP 75.99 sec // TOTAL 194.95 sec
+from 1/4° to lat-lon grid with Nx2N points
+bench on Intel(R) Xeon(R) CPU X5687  @ 3.60GHz with 32Go RAM
+single proc tests
 
-debug
-GRID 2.58 sec // WEIGHTS 124.26 sec // REMAP 93.30 sec // TOTAL 220.14 sec
+N=1024 --> 560s  ~9.2Gb RAM
+N= 720 --> 360s
+N= 512 --> 290s  ~4.5Gb RAM
+N= 360 --> 220s
+N=  64 --> 145s  ~2.9Gb RAM
+N=  32 --> 135s  ~2.9Gb RAM
 
-no debug -- already weights
-GRID 2.64 sec // WEIGHTS 0.19 sec // REMAP 82.19 sec // TOTAL 85.02 sec
+-- time for REMAPPING computations
 
-no debug -- already weights -- parallel=True
-GRID 2.62 sec // WEIGHTS 0.19 sec // REMAP 3.54 sec // TOTAL 6.35 sec
-????
-GRID 2.63 sec // WEIGHTS 0.27 sec // REMAP 37.38 sec // TOTAL 40.28 sec
-GRID 2.58 sec // WEIGHTS 0.19 sec // REMAP 58.47 sec // TOTAL 61.24 sec
-OK sans var[:,:,:,:]
-GRID 2.56 sec // WEIGHTS 0.19 sec // REMAP 2.99 sec // TOTAL 5.73 sec
----- NON CELA FAIT DES NaN
+once weights are calculated...
+remapping takes between 0.15s (N=32) to 0.7s (N=1024) 
+for a 2D field (or an horizontal slice on a 3D field)
 
-------------
+total time takes between 0.25s (N=32) to 1.7s (N=1024)
 
-remap.py -R TEST_DIAG/xios_diagfi_7420140-7610399.nc 32
+-------------------------------------------- dev
+
+-- 10% more if compiled with -g (debug)
+
+-- to be examined
 
 parallel=False
 GRID 0.02 sec // WEIGHTS 0.01 sec // REMAP 4.45 sec // TOTAL 4.48 sec
