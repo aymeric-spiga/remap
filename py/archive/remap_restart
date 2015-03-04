@@ -1,0 +1,1 @@
+mpirun -np 1 python remap.py FV1  test:polygon restart_icosa_nbp20_1y.nc  test:polygon restart_icosa.nc remap output.nc

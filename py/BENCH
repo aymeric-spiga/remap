@@ -1,0 +1,30 @@
+
+remap.py -R TEST_DIAG/xios_diagfi_7420140-7610399.nc 512
+
+no debug
+GRID 2.70 sec // WEIGHTS 116.25 sec // REMAP 75.99 sec // TOTAL 194.95 sec
+
+debug
+GRID 2.58 sec // WEIGHTS 124.26 sec // REMAP 93.30 sec // TOTAL 220.14 sec
+
+no debug -- already weights
+GRID 2.64 sec // WEIGHTS 0.19 sec // REMAP 82.19 sec // TOTAL 85.02 sec
+
+no debug -- already weights -- parallel=True
+GRID 2.62 sec // WEIGHTS 0.19 sec // REMAP 3.54 sec // TOTAL 6.35 sec
+????
+GRID 2.63 sec // WEIGHTS 0.27 sec // REMAP 37.38 sec // TOTAL 40.28 sec
+GRID 2.58 sec // WEIGHTS 0.19 sec // REMAP 58.47 sec // TOTAL 61.24 sec
+OK sans var[:,:,:,:]
+GRID 2.56 sec // WEIGHTS 0.19 sec // REMAP 2.99 sec // TOTAL 5.73 sec
+---- NON CELA FAIT DES NaN
+
+------------
+
+remap.py -R TEST_DIAG/xios_diagfi_7420140-7610399.nc 32
+
+parallel=False
+GRID 0.02 sec // WEIGHTS 0.01 sec // REMAP 4.45 sec // TOTAL 4.48 sec
+
+parallel=True
+GRID 0.02 sec // WEIGHTS 0.01 sec // REMAP 0.13 sec // TOTAL 0.16 sec

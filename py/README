@@ -1,0 +1,15 @@
+
+
+remap.py -R TEST_DIAG/xios_diagfi_7420140-7610399.nc 32
+remap.py -R TEST_DIAG/xios_diagfi_7420140-7610399.nc 256 -V u -V temp
+
+remap.py TEST_RESTART/restart_icosa_nbp20_1y.nc -D "test:polygon" TEST_RESTART/restart_icosa.nc -Z 'lev' -V theta_rhodz
+remap.py -S "test:polygon" TEST_RESTART/restart_icosa_nbp20_1y.nc -D "test:polygon" TEST_RESTART/restart_icosa.nc -Z 'lev' -V theta_rhodz
+
+remap.py TEST_RESTART/restart_icosa_nbp20_1y.nc -D "test:polygon" TEST_RESTART/restart_icosa.nc -Z 'lev' -V theta_rhodz -V ulon
+remap.py TEST_RESTART/restart_icosa_nbp20_1y.nc -D "test:polygon" TEST_RESTART/restart_icosa.nc -Z 'lev' -V theta_rhodz -V ulon -v phis -v ps
+
+
+remap.py -R TEST_DIAG/xios_diagfi_7420140-7610399.nc 32 -V u -z 6 -z 12
+
+TBD: class objects

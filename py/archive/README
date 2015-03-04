@@ -1,0 +1,22 @@
+simplegrid.py
+mpirun -np 1 python remap.py FV1  test:polygon TEST_DIAG/xios_diagfi_7420140-7610399.nc test:latlon simple32.nc remap yorgl.nc
+
+OU MAINTENANT
+
+mpirun -np 1 python remap.py FV1  test:polygon TEST_DIAG/xios_diagfi_7420140-7610399.nc ll 32 remap yorgl.nc
+
+
+PUIS
+
+ploticos.py
+
+
+MAINTENANT DIRECT
+mpirun -np 1 python remap.py FV1  test:polygon TEST_DIAG/xios_diagfi_7420140-7610399.nc ll 124 remap yorgl.nc
+OU MEME
+remap.py FV1  test:polygon TEST_DIAG/xios_diagfi_7420140-7610399.nc ll 124 remap yorgl.nc
+
+
+TBD: 
+- meilleures options
+- classe
