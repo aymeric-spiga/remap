@@ -365,6 +365,7 @@ if not opt.onlyweights:
         temp = f.createVariable(fieldchar, 'd', (vertchar,'cell'))
         temp.setncattr("coordinates", "presnivs lon lat")
       countlev=0
+      tmptime = time.time()
       for l in vertrange:
         if dim == 3: tab_loc = np.array(src_val_loc[0,l,:])
         elif dim == 2: tab_loc = np.array(src_val_loc[l,:])
@@ -375,6 +376,10 @@ if not opt.onlyweights:
         if rank == 0:
             dst_val = apply_weights(src_val_glo,A)
             temp[countlev,:] = dst_val
+        test = time.time() - tmptime
+        if test > 5.: 
+          print "5s elapsed. done up to vertical level %i" % (l)
+          tmptime = time.time()
         countlev = countlev+1
       if opt.reshaped:
         print "reshaping and writing...",fieldchar
