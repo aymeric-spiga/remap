@@ -12,9 +12,9 @@ def ll(N,M=None):
   N = int(N) 
   if M is None: M = 2*N
   deg = 180.0
-  #deg = 90.0
-  deg = 60.0
-  #deg = 30.0
+  #deg = 90.0 #works
+  #deg = 60.0 #works
+  #deg = 30.0 #does not work
   print deg/N
   print N/2
   lat1 = (deg/N)*np.arange(-N/2,N/2)
