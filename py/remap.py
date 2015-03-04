@@ -264,16 +264,13 @@ if not onlyweights:
 		c_centre_lon, c_centre_lat, c_areas)
       ##
       if parallel:
-        dst_areas_glo = MPI.COMM_WORLD.gather(np.array(c_areas[:]))
         dst_centre_lon_glo = MPI.COMM_WORLD.gather(np.array(c_centre_lon[:]))
         dst_centre_lat_glo = MPI.COMM_WORLD.gather(np.array(c_centre_lat[:]))
       else:
-        dst_areas_glo = np.array(c_areas[:])
         dst_centre_lon_glo = np.array(c_centre_lon[:])
         dst_centre_lat_glo = np.array(c_centre_lat[:])
       ##
       if rank == 0:
-          dst_areas = np.hstack(dst_areas_glo)
           dst_centre_lon = np.hstack(dst_centre_lon_glo)
           dst_centre_lat = np.hstack(dst_centre_lat_glo)
 
