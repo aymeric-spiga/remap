@@ -2,3 +2,6 @@
 *.so
 lib
 obj
+*.nc
+TEST_*
+yorgl*
