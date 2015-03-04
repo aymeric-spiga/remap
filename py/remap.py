@@ -52,8 +52,6 @@ remap.py [options] srcfile dstfile
                    or a netCDF file indicating destination grid
 '''
 ##
-parser.add_option('-W','--onlyweights',action='store_true',dest='onlyweights',default=False,\
-  help="only compute weights")
 parser.add_option('-F','--forceweights',action='store_true',dest='forceweights',default=False,\
   help="force computing of weights")
 parser.add_option('-S','--srctype',action='store',dest='srctype',default="test:polygon",\
@@ -95,8 +93,10 @@ except KeyError:
     print "Error: dsttype needs to be one of the following: " + " ".join(grid_types.keys()) + "."
     exit(2)
 ## FIELDCHAR
-if opt.fieldchar is None: opt.fieldchar = ["temp"]
-if opt.var2d is None: opt.var2d = ["ps"]
+if (opt.fieldchar is None) and (opt.var2d is None): 
+    print "WARNING! No fields indicated with -V or -v."
+    print "WARNING! Only considering computing weights."
+    onlyweights = True
 ## NO SPECIFIC OPERATION NEEDED
 vertchar = opt.vertchar
 interp = opt.interp
@@ -247,7 +247,7 @@ wtime = time.time() - stime
 ### REMAP ###
 #############
 stime = time.time()
-if not opt.onlyweights:
+if not onlyweights:
 
     print "**** REMAP ****"
 
@@ -401,14 +401,14 @@ if not opt.onlyweights:
         var = f.createVariable(fieldchar, 'd', ('Times',vertchar,'lat','lon'))
         var[:,:,:,:] = np.reshape(temp,shp3)
         print "...done"
+    f.close()
  
 rtime = time.time() - stime
-f.close()
 
 ############
 ### PLOT ###
 ############
-if not opt.onlyweights:
+if not onlyweights:
  if ("func" in dsttype) and (opt.plot):
   import ppplot
   print "**** PLOT ****"
