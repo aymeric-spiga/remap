@@ -119,16 +119,18 @@ else: computebary = True
 ####
 #### LOAD remap LIBRARY
 ####
-remap = ct.cdll.LoadLibrary(os.path.realpath('libmapper.so'))
+if computeweights or computebary:
+  remap = ct.cdll.LoadLibrary(os.path.realpath('libmapper.so'))
+  remap.mpi_init()
+  rank = remap.mpi_rank()
+  size = remap.mpi_size()
+else:
+  rank = 0
+  size = 1
 
 ###
 ### MAIN PROGRAM
 ###
-
-remap.mpi_init()
-rank = remap.mpi_rank()
-size = remap.mpi_size()
-#print rank, "/", size
 
 ############
 ### GRID ###
