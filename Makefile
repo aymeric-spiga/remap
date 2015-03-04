@@ -1,5 +1,6 @@
-CFLAGS = -ansi -pedantic -w -g -O2 -fPIC #-DDEBUG $(EXTRA_FLAGS)
-#CFLAGS = -ansi -w -O2 -fPIC #-DDEBUG $(EXTRA_FLAGS)
+#CFLAGS = -ansi -pedantic -w -g -O2 -fPIC #-DDEBUG $(EXTRA_FLAGS)
+#CFLAGS = -ansi -g -w -O2 -fPIC
+CFLAGS = -ansi -w -O0 -fPIC
 #CXX = OMPI_CXX=/opt/intel/bin/icpc mpic++ -DOMPI_SKIP_MPICXX
 CXX = mpicxx -DOMPI_SKIP_MPICXX
 CC = mpicc
