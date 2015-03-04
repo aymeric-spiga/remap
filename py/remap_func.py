@@ -15,8 +15,6 @@ def ll(N,M=None):
   #deg = 90.0 #works
   #deg = 60.0 #works
   #deg = 30.0 #does not work
-  print deg/N
-  print N/2
   lat1 = (deg/N)*np.arange(-N/2,N/2)
   lat2 = (deg/N)*np.arange(1-N/2,1+N/2)
   lon1 = (2.*deg/M)*np.arange(-M/2,M/2)
