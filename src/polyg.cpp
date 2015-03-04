@@ -48,7 +48,7 @@ Coord barycentre(const Coord *x, int n)
 		bc = bc + x[i];
 	/* both distances can be equal down to roundoff when norm(bc) < mashineepsilon 
 	   which can occur when weighted with tiny area */
-	assert(squaredist(bc, proj(bc)) <= squaredist(bc, proj(bc * (-1.0))));
+	/* assert(squaredist(bc, proj(bc)) <= squaredist(bc, proj(bc * (-1.0)))); */
 	//if (squaredist(bc, proj(bc)) > squaredist(bc, proj(bc * (-1.0)))) return proj(bc * (-1.0));
 
 	return proj(bc);
@@ -127,7 +127,8 @@ double triarea(Coord& A, Coord& B, Coord& C)
 	double c = ds(A, B);
 	double s = 0.5 * (a + b + c);
 	double t = tan(0.5*s) * tan(0.5*(s - a)) * tan(0.5*(s - b)) * tan(0.5*(s - c));
-	assert(t >= 0);
+	/** assert(t >= 0); */
+        if (t < 0) t=1.e-10;
 	return 4 * atan(sqrt(t));
 }
 
@@ -168,7 +169,7 @@ double airbar(int N, const Coord *x, const Coord *c, double *d, const Coord& pol
 		int ii = (i + 1) % N;
 		t[1] = x[i];
 		t[2] = x[ii];
-		assert(scalarprod(crossprod(t[1] - t[0], t[2] - t[0]), t[0]) >= 0); // Error: tri a l'env (wrong orientation)
+		/*assert(scalarprod(crossprod(t[1] - t[0], t[2] - t[0]), t[0]) >= 0); // Error: tri a l'env (wrong orientation)*/
 		double area_gc = triarea(t[0], t[1], t[2]);
 		double area_sc_gc_moon = 0;
 		if (d[i]) /* handle small circle case */
