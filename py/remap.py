@@ -54,6 +54,8 @@ remap.py [options] srcfile dstfile
 ##
 parser.add_option('-W','--onlyweights',action='store_true',dest='onlyweights',default=False,\
   help="only compute weights")
+parser.add_option('-F','--forceweights',action='store_true',dest='forceweights',default=False,\
+  help="force computing of weights")
 parser.add_option('-S','--srctype',action='store',dest='srctype',default="test:polygon",\
   help="grid type of source")
 parser.add_option('-D','--dsttype',action='store',dest='dsttype',default="ll",\
@@ -99,6 +101,21 @@ if opt.var2d is None: opt.var2d = ["ps"]
 vertchar = opt.vertchar
 interp = opt.interp
 
+##
+## test if we have to compute weights
+##
+wfile = srcfile+"_weights"
+if "func" in dsttype: wfile = wfile + "_" + dstfile
+wfile = wfile+'.nc'
+if opt.forceweights: computeweights = False
+else: computeweights = not(os.path.isfile(wfile))
+
+##
+## test if we have to compute barycentres
+##
+if "func" in dsttype: computebary = False
+else: computebary = True
+
 ####
 #### LOAD remap LIBRARY
 ####
@@ -112,7 +129,6 @@ remap.mpi_init()
 rank = remap.mpi_rank()
 size = remap.mpi_size()
 #print rank, "/", size
-
 
 ############
 ### GRID ###
@@ -140,18 +156,22 @@ else:
 	dst_lon = dst.variables[dsttype["lon_name"]]
 	dst_lat = dst.variables[dsttype["lat_name"]]
 
-## convert to C-type arrays for remap library
+## prepare dimensions and arrays for later use in library and computations
 dst_ncell, dst_nvert = dst_lon.shape
 dst_ncell_loc, dst_loc_start = compute_distribution(dst_ncell,rank,size)
-c_dst_lon = (ct.c_double * (dst_ncell_loc*dst_nvert))()
-zelen = len(c_dst_lon)
-c_dst_lon[:] = nc.numpy.reshape(dst_lon[dst_loc_start:dst_loc_start+dst_ncell_loc,:], (zelen,1))
-c_dst_lat = (ct.c_double * (dst_ncell_loc*dst_nvert))()
-c_dst_lat[:] = nc.numpy.reshape(dst_lat[dst_loc_start:dst_loc_start+dst_ncell_loc,:], (zelen,1))
 dstpole = (ct.c_double * (3))() ; dstpole[:] = dsttype["pole"]
 c_dst_ncell = ct.c_int(dst_ncell_loc)
 c_dst_nvert = ct.c_int(dst_nvert)
 order = ct.c_int(interp_types[interp])
+if computeweights or computebary:
+  print "convert and reshape to C-type arrays for remap library"
+  ## lon
+  c_dst_lon = (ct.c_double * (dst_ncell_loc*dst_nvert))()
+  zelen = len(c_dst_lon)
+  c_dst_lon[:] = nc.numpy.reshape(dst_lon[dst_loc_start:dst_loc_start+dst_ncell_loc,:], (zelen,1))
+  ## lat
+  c_dst_lat = (ct.c_double * (dst_ncell_loc*dst_nvert))()
+  c_dst_lat[:] = nc.numpy.reshape(dst_lat[dst_loc_start:dst_loc_start+dst_ncell_loc,:], (zelen,1))
 
 gtime = time.time() - stime
 
@@ -160,15 +180,10 @@ gtime = time.time() - stime
 ###############
 print "**** WEIGHTS ****"
 stime = time.time()
-### -- test if weight file does exist
-wfile = srcfile+"_weights"
-if "func" in dsttype: wfile = wfile + "_" + dstfile
-wfile = wfile+'.nc'
-wfileexist = os.path.isfile(wfile)
 ### -- if weight file does not exist, calculate weights and create file
 ### -- if weight file does exist, read weights
 if rank == 0:
- if not wfileexist:
+ if computeweights:
     print "Calling remap library to compute weights."
     c_nweight = ct.c_int()
     ## convert to C-type arrays for remap library
@@ -237,7 +252,7 @@ if not opt.onlyweights:
     print "**** REMAP ****"
 
     ### Barycentres and areas if needed
-    if "func" not in dsttype:
+    if computebary:
       print 'Get barycentres and areas'
       ##
       c_centre_lon = (ct.c_double * dst_ncell_loc)()
