@@ -127,8 +127,15 @@ double triarea(Coord& A, Coord& B, Coord& C)
 	double c = ds(A, B);
 	double s = 0.5 * (a + b + c);
 	double t = tan(0.5*s) * tan(0.5*(s - a)) * tan(0.5*(s - b)) * tan(0.5*(s - c));
-	/** assert(t >= 0); */
-        if (t < 0) t=1.e-10;
+        /* AS: slightly negative values might occur */
+        /* -- if so, we check those are small enough */
+        /* -- then we take the corresponding slightly positive value */
+        /* -- the resulting arctan is close to zero anyway */
+        if (not(t >= 0))
+        {
+          assert(fabs(t) < 1.e15);
+          t=-t;
+        }
 	return 4 * atan(sqrt(t));
 }
 
