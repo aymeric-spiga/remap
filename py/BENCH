@@ -17,8 +17,10 @@ N=  32 --> 135s  ~2.9Gb RAM
 once weights are calculated...
 remapping takes between 0.15s (N=32) to 0.7s (N=1024) 
 for a 2D field (or an horizontal slice on a 3D field)
-
 total time takes between 0.25s (N=32) to 1.7s (N=1024)
+
+for two 3D fields with 64levels and one 2D field to N=1024
+--> total time is about 1min
 
 -------------------------------------------- dev
 
