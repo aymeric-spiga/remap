@@ -84,7 +84,11 @@ void intersect(Elt *a, Elt *b)
 		nc = assemble(iscot, c, d, xc);
 	while (iscot.size() && nc2 < 2)
 		nc2 = assemble(iscot, c2, d2, xc2);
-	/* assert(nseg == nc + nc2 || nseg == 1); // unused segment */
+	/*assert(nseg == nc + nc2 || nseg == 1); // unused segment*/
+        if (not(nseg == nc + nc2 || nseg == 1))
+        {
+cerr << "WARNING. NOT assert(nseg == nc + nc2 || nseg == 1). ";
+        }
 	if (nc == 1) nc = 0;
 	if (nc2 == 1) nc2 = 0;
 	gc = barycentre(xc, nc);

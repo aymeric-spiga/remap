@@ -50,7 +50,10 @@ Coord barycentre(const Coord *x, int n)
 	   which can occur when weighted with tiny area */
 	/* assert(squaredist(bc, proj(bc)) <= squaredist(bc, proj(bc * (-1.0)))); */
 	//if (squaredist(bc, proj(bc)) > squaredist(bc, proj(bc * (-1.0)))) return proj(bc * (-1.0));
-
+        if (not(squaredist(bc, proj(bc)) <= squaredist(bc, proj(bc * (-1.0)))))
+        {
+cerr << "WARNING. NOT (squaredist(bc, proj(bc)) <= squaredist(bc, proj(bc * (-1.0))))." << endl;
+        }
 	return proj(bc);
 }
 
@@ -177,6 +180,10 @@ double airbar(int N, const Coord *x, const Coord *c, double *d, const Coord& pol
 		t[1] = x[i];
 		t[2] = x[ii];
 		/*assert(scalarprod(crossprod(t[1] - t[0], t[2] - t[0]), t[0]) >= 0); // Error: tri a l'env (wrong orientation)*/
+                if (not(scalarprod(crossprod(t[1] - t[0], t[2] - t[0]), t[0]) >= 0))
+                {
+cerr << "WARNING. wrong orientation.";
+                }
 		double area_gc = triarea(t[0], t[1], t[2]);
 		double area_sc_gc_moon = 0;
 		if (d[i]) /* handle small circle case */
