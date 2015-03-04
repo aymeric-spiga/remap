@@ -97,6 +97,8 @@ if (opt.fieldchar is None) and (opt.var2d is None):
     print "WARNING! No fields indicated with -V or -v."
     print "WARNING! Only considering computing weights."
     onlyweights = True
+else:
+    onlyweights = False
 ## NO SPECIFIC OPERATION NEEDED
 vertchar = opt.vertchar
 interp = opt.interp
