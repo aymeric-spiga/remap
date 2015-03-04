@@ -351,7 +351,8 @@ if not onlyweights:
     ########################################################################
 
     # 2D FIELD
-    for var2d in opt.var2d:
+    if opt.var2d is not None:
+     for var2d in opt.var2d:
       print "remapping...",var2d
       src_val_loc = src.variables[var2d]
       dim = len(src_val_loc.shape)
@@ -373,7 +374,8 @@ if not onlyweights:
         var[:,:,:] = np.reshape(ps,shp)
 
     # 3D FIELD
-    for fieldchar in opt.fieldchar:
+    if opt.fieldchar is not None:
+     for fieldchar in opt.fieldchar:
       print "remapping... %s with %i levels" % (fieldchar,nz)
       src_val_loc = src.variables[fieldchar]
       dim = len(src_val_loc.shape)
