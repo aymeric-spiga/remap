@@ -3,7 +3,7 @@
 ##
 ## REMAP
 ##
-## rewrite + generalization + options + optimization: A. Spiga Feb 2015
+## rewrite + generalization + options + optimization: A. Spiga March 2015
 ##
 
 import netCDF4 as nc
@@ -53,27 +53,27 @@ remap.py [options] srcfile dstfile
 '''
 ##
 parser.add_option('-F','--forceweights',action='store_true',dest='forceweights',default=False,\
-  help="force computing of weights")
+  help="force computing of weights [F]")
 parser.add_option('-S','--srctype',action='store',dest='srctype',default="test:polygon",\
-  help="grid type of source")
+  help="grid type of source [test:polygon]")
 parser.add_option('-D','--dsttype',action='store',dest='dsttype',default="ll",\
-  help="grid type of destination")
+  help="grid type of destination [ll]")
 parser.add_option('-o','--outfile',action='store',dest='outfile',type="string",default="outremap.nc",\
-  help="output file")
+  help="output file [outremap.nc]")
 parser.add_option('-R','--reshaped',action='store_true',dest='reshaped',default=False,\
-  help="output reshaped fields on a 2D grid")
+  help="output reshaped fields on a 2D grid [F]")
 parser.add_option('-i','--interp',action='store',dest='interp',type="string",default="FV1",\
-  help="interpolation method (FV1 FV2) first order conservative Finite Volume")
+  help="interpolation method (FV1 FV2) conservative Finite Volume [FV1]")
 parser.add_option('-v','--var2d',action='append',dest='var2d',type="string",default=None,\
-  help="2D field [append is possible]")
+  help="2D field [append is possible, default None]")
 parser.add_option('-V','--var3d',action='append',dest='fieldchar',type="string",default=None,\
-  help="3D field [append is possible]")
+  help="3D field [append is possible, default None]")
 parser.add_option('-Z','--vert',action='store',dest='vertchar',type="string",default="presnivs",\
-  help="vertical coordinate")
+  help="vertical coordinate [presnivs]")
 parser.add_option('-z','--level',action='append',dest='z',type="int",default=None,\
-  help="choose vertical indexes to be interpolated [append is possible]")
+  help="choose vertical indexes to be interpolated [append is possible, default None]")
 parser.add_option('-P','--plot',action='store_true',dest='plot',default=False,\
-  help="plot fields")
+  help="plot fields [F]")
 ##
 (opt,args) = parser.parse_args()
 if (len(args) == 0): parser.print_version() ; exit()
