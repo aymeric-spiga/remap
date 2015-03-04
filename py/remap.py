@@ -66,7 +66,7 @@ parser.add_option('-i','--interp',action='store',dest='interp',type="string",def
   help="interpolation method (FV1 FV2) conservative Finite Volume [FV1]")
 parser.add_option('-v','--var2d',action='append',dest='var2d',type="string",default=None,\
   help="2D field [append is possible, default None]")
-parser.add_option('-V','--var3d',action='append',dest='fieldchar',type="string",default=None,\
+parser.add_option('-V','--var3d',action='append',dest='var3d',type="string",default=None,\
   help="3D field [append is possible, default None]")
 parser.add_option('-Z','--vert',action='store',dest='vertchar',type="string",default="presnivs",\
   help="vertical coordinate [presnivs]")
@@ -93,7 +93,7 @@ except KeyError:
     print "Error: dsttype needs to be one of the following: " + " ".join(grid_types.keys()) + "."
     exit(2)
 ## FIELDCHAR
-if (opt.fieldchar is None) and (opt.var2d is None): 
+if (opt.var3d is None) and (opt.var2d is None): 
     print "WARNING! No fields indicated with -V or -v."
     print "WARNING! Only considering computing weights."
     onlyweights = True
@@ -374,13 +374,13 @@ if not onlyweights:
         var[:,:,:] = np.reshape(ps,shp)
 
     # 3D FIELD
-    if opt.fieldchar is not None:
-     for fieldchar in opt.fieldchar:
-      print "remapping... %s with %i levels" % (fieldchar,nz)
-      src_val_loc = src.variables[fieldchar]
+    if opt.var3d is not None:
+     for var3d in opt.var3d:
+      print "remapping... %s with %i levels" % (var3d,nz)
+      src_val_loc = src.variables[var3d]
       dim = len(src_val_loc.shape)
       if not opt.reshaped:
-        temp = f.createVariable(fieldchar, 'd', (vertchar,'cell'))
+        temp = f.createVariable(var3d, 'd', (vertchar,'cell'))
         temp.setncattr("coordinates", "presnivs lon lat")
       countlev=0
       tmptime = time.time()
@@ -400,8 +400,8 @@ if not onlyweights:
           tmptime = time.time()
         countlev = countlev+1
       if opt.reshaped:
-        print "reshaping and writing...",fieldchar
-        var = f.createVariable(fieldchar, 'd', ('Times',vertchar,'lat','lon'))
+        print "reshaping and writing...",var3d
+        var = f.createVariable(var3d, 'd', ('Times',vertchar,'lat','lon'))
         var[:,:,:,:] = np.reshape(temp,shp3)
         print "...done"
     f.close()
