@@ -54,6 +54,8 @@ remap.py [options] srcfile dstfile
 ##
 parser.add_option('-F','--forceweights',action='store_true',dest='forceweights',default=False,\
   help="force computing of weights [F]")
+parser.add_option('-W','--weightfile',action='store',dest='weightfile',type="string",default=None,\
+  help="prescribe name of weight file (either existing or not) [None]")
 parser.add_option('-S','--srctype',action='store',dest='srctype',default="test:polygon",\
   help="grid type of source [test:polygon]")
 parser.add_option('-D','--dsttype',action='store',dest='dsttype',default="ll",\
@@ -106,10 +108,13 @@ interp = opt.interp
 ##
 ## test if we have to compute weights
 ##
-wfile = srcfile+"_weights"
-if "func" in dsttype: wfile = wfile + "_" + dstfile
-wfile = wfile+'.nc'
-if opt.forceweights: computeweights = False
+if opt.weightfile is None:
+  wfile = srcfile+"_weights"
+  if "func" in dsttype: wfile = wfile + "_" + dstfile
+  wfile = wfile+'.nc'
+else:
+  wfile = opt.weightfile
+if opt.forceweights: computeweights = True
 else: computeweights = not(os.path.isfile(wfile))
 
 ##
