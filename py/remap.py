@@ -21,6 +21,8 @@ parallel=False
 parallel=True
 if parallel: from mpi4py import MPI
 
+timechar="time_counter"
+
 ##########
 ## DICT ##
 ##########
@@ -74,6 +76,8 @@ parser.add_option('-Z','--vert',action='store',dest='vertchar',type="string",def
   help="vertical coordinate [presnivs]")
 parser.add_option('-z','--level',action='append',dest='z',type="int",default=None,\
   help="choose vertical indexes to be interpolated [append is possible, default None]")
+parser.add_option('-t','--time',action='append',dest='t',type="int",default=None,\
+  help="choose time indexes to be interpolated [append is possible, default None]")
 parser.add_option('-P','--plot',action='store_true',dest='plot',default=False,\
   help="plot fields [F]")
 ##
@@ -289,6 +293,14 @@ if not onlyweights:
     else:
       vertrange = opt.z ; nz = len(vertrange)
 
+    ### determine time
+    zetime=src.variables[timechar]
+    nt = len(zetime)
+    if opt.t is None:
+      timerange = range(nt)
+    else:
+      timerange = opt.t ; nt = len(timerange)
+
     ### Prepare netCDF file for write
     f = nc.Dataset(opt.outfile,'w')
     ### first treat vertical coordinates
@@ -301,43 +313,43 @@ if not onlyweights:
     ### second, horizontal coordinates
     ### -- two modes: based on cells (default), or based on lat/lon (if reshaped=True)
     if opt.reshaped:
-        ps = np.zeros( dst_ncell )
-        temp = np.zeros( (nz,dst_ncell) )
+        ps = np.zeros( (nt,dst_ncell) )
+        temp = np.zeros( (nt,nz,dst_ncell) )
         ##
         N = np.int(np.sqrt(dst_ncell/2))
-        nt = 1
         shp = (nt,N,N*2)
         shp3 = (nt,nz,N,N*2)
         shphor = (N,N*2)
         ##
-        f.createDimension('lon', N*2)
-        f.createDimension('lat', N)
-        f.createDimension('Times', nt)
+        f.createDimension('longitude', N*2)
+        f.createDimension('latitude', N)
+        f.createDimension(timechar, nt)
         ##
-        var = f.createVariable('lon', 'd', ('lon'))
+        var = f.createVariable('longitude', 'd', ('longitude'))
         var.setncattr("long_name", "longitude")
         var.setncattr("units", "deg north")
         var[:] = np.unique(dst_centre_lon)[:]
         ##
-        var = f.createVariable('lat', 'd', ('lat'))
+        var = f.createVariable('latitude', 'd', ('latitude'))
         var.setncattr("long_name", "latitude")
         var.setncattr("units", "deg east")
         var[:] = np.unique(dst_centre_lat)[:]
         ##
-        var = f.createVariable('Times', 'd', ('Times'))
-        var[:] = [0.]
+        var = f.createVariable(timechar, 'd', (timechar))
+        var[:] = timerange[:]
     else:
+        ### TBD: add Time!!
 #	nq=src.dimensions['nq']
 	f.createDimension('nvert', dst_nvert)
 	f.createDimension('cell', dst_ncell)
 #	f.createDimension('nq', len(nq))
 
-	var = f.createVariable('lat', 'd', ('cell'))
+	var = f.createVariable('latitude', 'd', ('cell'))
 	var.setncattr("long_name", "latitude")
 	var.setncattr("units", "degrees_north")
 	var.setncattr("bounds", "bounds_lat")
 	var[:] = dst_centre_lat
-	var = f.createVariable('lon', 'd', ('cell'))
+	var = f.createVariable('longitude', 'd', ('cell'))
 	var.setncattr("long_name", "longitude")
 	var.setncattr("units", "degrees_east")
 	var.setncattr("bounds", "bounds_lon")
@@ -356,41 +368,62 @@ if not onlyweights:
     ########################################################################
 
     # 2D FIELD
+    # ... if 2D fields are requested
     if opt.var2d is not None:
+     # ... for all 2D fields
      for var2d in opt.var2d:
-      print "remapping...",var2d
+      print "remapping... %s with %i time samples" % (var2d,nt)
       src_val_loc = src.variables[var2d]
       dim = len(src_val_loc.shape)
-      if dim == 2: tab_loc = np.array(src_val_loc[0,:])
-      elif dim == 1: tab_loc = np.array(src_val_loc[:])
-      if parallel:
-        src_val_glo = MPI.COMM_WORLD.gather(tab_loc)
-      else:
-        src_val_glo = tab_loc
-      if rank == 0:
-          dst_val = apply_weights(src_val_glo,A)
-          if not opt.reshaped:
-            ps = f.createVariable(var2d, 'd', ('cell'))
-            ps.setncattr("coordinates", "lon lat")
-          ps[:] = dst_val
+      tmptime = time.time()
+      # ... for all stored time samples
+      count = 0
+      for tt in timerange:
+        if dim == 2: tab_loc = np.array(src_val_loc[tt,:])
+        elif dim == 1: tab_loc = np.array(src_val_loc[:])
+        elif dim > 2: print "are you sure this is a 2D field?" ; exit()
+        if parallel:
+          src_val_glo = MPI.COMM_WORLD.gather(tab_loc)
+        else:
+          src_val_glo = tab_loc
+        if rank == 0:
+            dst_val = apply_weights(src_val_glo,A)
+            if not opt.reshaped:
+              ps = f.createVariable(var2d, 'd', (timechar,'cell'))
+              ps.setncattr("coordinates", "time lon lat")
+            ps[count,:] = dst_val
+        count = count + 1
+        ## display time
+        test = time.time() - tmptime
+        if test > 5.:
+          print "5s elapsed. done up to time %i/%i" % (count+1,nt)
+          tmptime = time.time()
+      # reshape if necessary
       if opt.reshaped:
         print "reshaping and writing...",var2d
-        var = f.createVariable(var2d, 'd', ('Times','lat','lon'))
+        var = f.createVariable(var2d, 'd', (timechar,'latitude','longitude'))
         var[:,:,:] = np.reshape(ps,shp)
 
     # 3D FIELD
+    # ... if 3D fields are requested
     if opt.var3d is not None:
+     # ... for all 3D fields
      for var3d in opt.var3d:
-      print "remapping... %s with %i levels" % (var3d,nz)
+      print "remapping... %s with %i levels %i time samples" % (var3d,nz,nt)
       src_val_loc = src.variables[var3d]
       dim = len(src_val_loc.shape)
       if not opt.reshaped:
-        temp = f.createVariable(var3d, 'd', (vertchar,'cell'))
-        temp.setncattr("coordinates", "presnivs lon lat")
-      countlev=0
+        temp = f.createVariable(var3d, 'd', (timechar,vertchar,'cell'))
+        temp.setncattr("coordinates", "time presnivs lon lat")
       tmptime = time.time()
+      # ... for all vertical levels 
+      countlev=0
       for l in vertrange:
-        if dim == 3: tab_loc = np.array(src_val_loc[0,l,:])
+       # ... for all stored time samples
+       count=0
+       for tt in timerange:
+        ##
+        if dim == 3: tab_loc = np.array(src_val_loc[tt,l,:])
         elif dim == 2: tab_loc = np.array(src_val_loc[l,:])
         if parallel:
           src_val_glo = MPI.COMM_WORLD.gather(tab_loc)
@@ -398,15 +431,20 @@ if not onlyweights:
           src_val_glo = tab_loc
         if rank == 0:
             dst_val = apply_weights(src_val_glo,A)
-            temp[countlev,:] = dst_val
+            temp[count,countlev,:] = dst_val
+        ## display time
         test = time.time() - tmptime
         if test > 5.: 
-          print "5s elapsed. done up to vertical level %i" % (l)
+          print "5s elapsed. done up to vertical level %i/%i time %i/%i" % (countlev+1,nz,count+1,nt)
           tmptime = time.time()
-        countlev = countlev+1
+        # increment time
+        count = count+1
+       # increment level
+       countlev = countlev+1
+      # reshape if necessary
       if opt.reshaped:
         print "reshaping and writing...",var3d
-        var = f.createVariable(var3d, 'd', ('Times',vertchar,'lat','lon'))
+        var = f.createVariable(var3d, 'd', (timechar,vertchar,'latitude','longitude'))
         var[:,:,:,:] = np.reshape(temp,shp3)
         print "...done"
     f.close()
