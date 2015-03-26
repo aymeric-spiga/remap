@@ -1,9 +1,10 @@
 #CFLAGS = -ansi -pedantic -w -g -O2 -fPIC #-DDEBUG $(EXTRA_FLAGS)
 #CFLAGS = -ansi -g -w -O2 -fPIC
-CFLAGS = -ansi -w -O0 -fPIC
+#CFLAGS = -ansi -w -O0 -fPIC
+CFLAGS = -ansi -w -O3 -fPIC
 #CXX = OMPI_CXX=/opt/intel/bin/icpc mpic++ -DOMPI_SKIP_MPICXX
-CXX = mpicxx -DOMPI_SKIP_MPICXX
-CC = mpicc
+CXX = /u/aslmd/miniconda/bin/mpicxx -DOMPI_SKIP_MPICXX
+CC = /u/aslmd/miniconda/bin/mpicc
 
 vpath %.cpp src
 SRC = circle.cpp cputime.cpp grid.cpp inside.cpp intersect.cpp \
