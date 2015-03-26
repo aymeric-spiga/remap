@@ -1,5 +1,7 @@
 
 
+
+
 remap.py -R TEST_DIAG/xios_diagfi_7420140-7610399.nc 32
 remap.py -R TEST_DIAG/xios_diagfi_7420140-7610399.nc 256 -V u -V temp
 
@@ -10,6 +12,11 @@ remap.py TEST_RESTART/restart_icosa_nbp20_1y.nc -D "test:polygon" TEST_RESTART/r
 remap.py TEST_RESTART/restart_icosa_nbp20_1y.nc -D "test:polygon" TEST_RESTART/restart_icosa.nc -Z 'lev' -V theta_rhodz -V ulon -v phis -v ps
 
 
-remap.py -R TEST_DIAG/xios_diagfi_7420140-7610399.nc 32 -V u -z 6 -z 12
+remap.py -R TEST_DIAG/xios_diagfi_7420140-7610399.nc 32 -V u -z 6 -z 12 -t 0
+
+
+remap.py -R -W weights_UHD_to_1024.nc xios_diagfi_1969191000-1988216999.nc 1024 -V u -z 30 -t 0
+1024 not mandatory here? TBD
+
 
 TBD: class objects
