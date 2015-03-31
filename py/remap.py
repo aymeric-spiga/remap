@@ -1,9 +1,10 @@
 #! /usr/bin/env python
-
+###########
+## REMAP ##
+###########
 ##
-## REMAP
-##
-## rewrite + generalization + options + optimization: A. Spiga March 2015
+## first operational version: Matthias Aechner -- 2014
+## rewrite + generalization + options + optimization: Aymeric SPIGA -- March 2015
 ##
 
 import netCDF4 as nc
