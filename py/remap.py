@@ -100,8 +100,10 @@ except KeyError:
     exit(2)
 ## FIELDCHAR
 if (opt.var3d is None) and (opt.var2d is None): 
-    print "WARNING! No fields indicated with -V or -v."
-    print "WARNING! Only considering computing weights."
+    print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    print "  WARNING! No fields indicated with -V or -v."
+    print "  WARNING! Only considering computing weights."
+    print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
     onlyweights = True
 else:
     onlyweights = False
