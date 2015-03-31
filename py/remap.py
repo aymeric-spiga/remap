@@ -304,7 +304,7 @@ if not onlyweights:
       timerange = opt.t ; nt = len(timerange)
 
     ### Prepare netCDF file for write
-    f = nc.Dataset(opt.outfile,'w')
+    f = nc.Dataset(opt.outfile,'w',format='NETCDF3_CLASSIC')
     ### first treat vertical coordinates
     f.createDimension(vertchar, nz)
     var = f.createVariable(vertchar, 'd', (vertchar))
@@ -325,7 +325,7 @@ if not onlyweights:
         ##
         f.createDimension('longitude', N*2)
         f.createDimension('latitude', N)
-        f.createDimension(timechar, nt)
+        f.createDimension(timechar, None) #nt)
         ##
         var = f.createVariable('longitude', 'd', ('longitude'))
         var.setncattr("long_name", "longitude")
