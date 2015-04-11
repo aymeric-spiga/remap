@@ -23,6 +23,7 @@ parallel=True
 if parallel: from mpi4py import MPI
 
 timechar="time_counter"
+daysec = 38052.
 
 ##########
 ## DICT ##
@@ -339,7 +340,14 @@ if not onlyweights:
         var[:] = np.unique(dst_centre_lat)[:]
         ##
         var = f.createVariable(timechar, 'd', (timechar))
-        var[:] = timerange[:]
+        try:
+          ### get time values
+          yorgl = nc.Dataset(srcfile)
+          zevar = yorgl.variables[timechar]
+          var[:] = zevar[timerange[:]] / daysec
+        except:
+          print "--- had a problem reading time values. use indexes for dest file."
+          var[:] = timerange[:]
     else:
         ### TBD: add Time!!
 #	nq=src.dimensions['nq']

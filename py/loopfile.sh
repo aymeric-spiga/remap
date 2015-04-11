@@ -1,48 +1,25 @@
 #! /bin/bash
 # A. Spiga 30/03/2015
 
-############
-field3="u"
-field3="temp"
-############
-res=16
-############
+#wfile="weights_UHD_to_240_equator.nc"
 
-############
-field3="temp"
-field2="ISR"
-daz=55
+
+
+################################################
+opt="-t 99 -z 35 -V u -V temp -V p -v ISR"
 res=720
-############
+target="all720.nc"
+################################################
 
 
-field3="p"
-field2="ps"
-res=720
-
-
-
-## ALTITUDE
-if [[ "$daz" != "" ]]; then
-  zed="-z $daz"
-else
-  zed=""
+## WEIGHTS
+if [[ "$wfile" == "" ]]; then
+  wfile="weights_UHD_to_$res.nc"
 fi
 
-## FIELD 2D and 3D
-
-field=""
-nfield=""
-if [[ "$field3" != "" ]]; then
-  field=$field" -V $field3"
-  nfield=$nfield$field3"_"
-fi
-if [[ "$field2" != "" ]]; then
-  field=$field" -v $field2"
-  nfield=$nfield$field2"_"
-fi
-
-## MAIN LOOP
+###############
+## MAIN LOOP ##
+###############
 
 var=0
 list=""
@@ -54,16 +31,24 @@ do
     dafile="file"$var".nc"
     echo $var $file $dafile
 
-    ./remap.py -R -W weights_UHD_to_$res.nc $file $res $field -t 0 $zed -o $dafile
+    # check time flag
+    ncdump -h $file | tail -n 2 | head -n 1
 
+    ## get sol number
+    #num=`basename $file '.nc' | sed s/'xios_diagfi_'/''/g | sed s/'-'/' '/g | awk '{print $2}'`
+    #kron=$((num / 38052))
+
+    # REMAP REMAP REMAP
+    ./remap.py -R -W $wfile $file $res $field $opt -o $dafile > /dev/null
+
+    # populate list
     if [ "$?" -ne "0" ]; then
       echo "FAILED"
     else
       list=$list" "$dafile
-      echo $list
     fi
 
 done
 
-ncrcat -O $list $res"_"$nfield$daz.nc
+ncrcat -O $list $target
 \rm $list
